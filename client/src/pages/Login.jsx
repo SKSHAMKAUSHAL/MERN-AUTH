@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import axios from "axios";
+
 const Login = () => {
   const { backendUrl, setIsLoggedIn, getUserData } = useContext(AppContext);
-
   const navigate = useNavigate();
 
   const [state, setState] = useState("Sign Up");
@@ -26,9 +26,11 @@ const Login = () => {
           password,
         });
         if (data.success) {
-          setIsLoggedIn(true);
-          navigate("/");
-          toast.success("Welcome");
+          setState("Login"); // Switch to Login state after successful registration
+          setName(""); // Clear name field
+          setEmail(""); // Clear email field
+          setPassword(""); // Clear password field
+          toast.success("Registration successful! Please log in.");
         } else {
           toast.error(data.message);
         }
