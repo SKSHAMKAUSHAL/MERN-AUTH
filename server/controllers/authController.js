@@ -21,12 +21,13 @@ export const register = async (req, res) => {
 
     await user.save();
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    console.log("Register: Generated token:", token); // Debug token
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production" ? true : false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     const mailOptions = {
@@ -40,6 +41,7 @@ export const register = async (req, res) => {
 
     return res.json({ success: true });
   } catch (error) {
+    console.error("Register error:", error.message);
     res.json({ success: false, message: error.message });
   }
 };
@@ -61,16 +63,18 @@ export const login = async (req, res) => {
       return res.json({ success: false, message: "Invalid password" });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    console.log("Login: Generated token:", token); // Debug token
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production" ? true : false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.json({ success: true });
   } catch (error) {
+    console.error("Login error:", error.message);
     res.json({ success: false, message: error.message });
   }
 };
@@ -79,12 +83,13 @@ export const logout = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production" ? true : false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.json({ success: true, message: "logout" });
   } catch (error) {
+    console.error("Logout error:", error.message);
     res.json({ success: false, message: error.message });
   }
 };
@@ -106,10 +111,9 @@ export const sendVerifyOtp = async (req, res) => {
       return res.status(400).json({ success: false, message: "Account already verified" });
     }
 
-    // Generate 6-digit OTP
     const otp = String(Math.floor(100000 + Math.random() * 900000));
     user.verifyOtp = otp;
-    user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000;
 
     await user.save();
     console.log("Saved OTP to database:", user.verifyOtp);
@@ -125,7 +129,7 @@ export const sendVerifyOtp = async (req, res) => {
 
     return res.json({ success: true, message: "Verification OTP sent to email" });
   } catch (error) {
-    console.error(error);
+    console.error("SendVerifyOtp error:", error.message);
     return res.status(500).json({ success: false, message: "Server error: " + error.message });
   }
 };
@@ -154,6 +158,7 @@ export const verifyEmail = async (req, res) => {
     await user.save();
     return res.json({ success: true, message: "Email verified successfully" });
   } catch (error) {
+    console.error("VerifyEmail error:", error.message);
     return res.json({ success: false, message: error.message });
   }
 };
@@ -162,6 +167,7 @@ export const isAuthenticated = async (req, res) => {
   try {
     return res.json({ success: true });
   } catch (error) {
+    console.error("IsAuthenticated error:", error.message);
     res.json({ success: false, message: error.message });
   }
 };
@@ -179,8 +185,8 @@ export const sendResetOtp = async (req, res) => {
     }
 
     const otp = String(Math.floor(100000 + Math.random() * 900000));
-    user.resetRobert = otp;
-    user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000; 
+    user.resetOtp = otp;
+    user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000;
     await user.save();
 
     const mailOptions = {
@@ -193,6 +199,7 @@ export const sendResetOtp = async (req, res) => {
     await transporter.sendMail(mailOptions);
     return res.json({ success: true, message: "OTP sent to your email" });
   } catch (error) {
+    console.error("SendResetOtp error:", error.message);
     res.json({ success: false, message: error.message });
   }
 };
@@ -228,6 +235,7 @@ export const resetPassword = async (req, res) => {
 
     return res.json({ success: true, message: "Password has been reset successfully" });
   } catch (error) {
+    console.error("ResetPassword error:", error.message);
     return res.json({ success: false, message: error.message });
   }
 };

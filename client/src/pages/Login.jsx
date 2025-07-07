@@ -26,10 +26,10 @@ const Login = () => {
           password,
         });
         if (data.success) {
-          setState("Login"); // Switch to Login state after successful registration
-          setName(""); // Clear name field
-          setEmail(""); // Clear email field
-          setPassword(""); // Clear password field
+          setState("Login");
+          setName("");
+          setEmail("");
+          setPassword("");
           toast.success("Registration successful! Please log in.");
         } else {
           toast.error(data.message);
@@ -41,14 +41,18 @@ const Login = () => {
         });
         if (data.success) {
           setIsLoggedIn(true);
-          getUserData();
-          navigate("/");
-          toast.success("Welcome");
+          // Add delay to ensure cookie is set
+          setTimeout(async () => {
+            await getUserData();
+            navigate("/");
+            toast.success("Welcome");
+          }, 500);
         } else {
           toast.error(data.message);
         }
       }
     } catch (error) {
+      console.error("Login error:", error.message);
       toast.error(error.message);
     }
   };
@@ -65,9 +69,7 @@ const Login = () => {
           {state === "Sign Up" ? "Create Account" : "Login"}
         </h2>
         <p className="text-center text-sm mb-6">
-          {state === "Sign Up"
-            ? "Create your account"
-            : "Login to your account!"}
+          {state === "Sign Up" ? "Create your account" : "Login to your account!"}
         </p>
         <form onSubmit={onSubmitHandler}>
           {state === "Sign Up" && (
@@ -108,9 +110,7 @@ const Login = () => {
               type="password"
               placeholder="Password"
               required
-              autoComplete={
-                state === "Sign Up" ? "new-password" : "current-password"
-              }
+              autoComplete={state === "Sign Up" ? "new-password" : "current-password"}
             />
           </div>
 
@@ -126,7 +126,7 @@ const Login = () => {
         </form>
 
         {state === "Sign Up" ? (
-          <p className="text-gary-400 text-center text-xs mt-4">
+          <p className="text-gray-400 text-center text-xs mt-4">
             Already have an account?{" "}
             <span
               onClick={() => setState("Login")}
@@ -136,7 +136,7 @@ const Login = () => {
             </span>
           </p>
         ) : (
-          <p className="text-gary-400 text-center text-xs mt-4">
+          <p className="text-gray-400 text-center text-xs mt-4">
             Don't have an account?{" "}
             <span
               onClick={() => setState("Sign Up")}

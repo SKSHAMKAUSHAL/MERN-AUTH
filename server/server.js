@@ -12,8 +12,8 @@ const port = process.env.PORT || 4000;
 connectDB();
 
 const allowedOrigins = [
-  "http://localhost:5173", 
-  "https://no-1-mern-auth.netlify.app", 
+  "http://localhost:5173",
+  "https://no-1-mern-auth.netlify.app",
 ];
 
 app.use(express.json());
@@ -21,6 +21,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: (origin, callback) => {
+      console.log("Request Origin:", origin); // Debug CORS
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -31,6 +32,7 @@ app.use(
   })
 );
 
+// API endpoints
 app.get("/", (req, res) => res.send("API WORKING"));
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);

@@ -1,24 +1,24 @@
- 
- import userModel from "../modals/userModel.js";
- export const getUserData = async (req,res)=>{
-    try {
-        const {userId} = req.body;
-        const user = await userModel.findById(userId);
+import userModel from "../modals/userModel.js";
 
-        if(!user){
-            return res.json({ success :false , message:'User not found'})
-        }
+export const getUserData = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    console.log("GetUserData: User ID:", userId); // Debug userId
+    const user = await userModel.findById(userId);
 
- res.json({
-    success: true,
-    userData:{
-        name : user.name,
-        isAccountVerified:user.isAccountVerified
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
     }
- })
-        
 
-    } catch (error) {
-        return res.json({success: false , message:error.message})
-    }
- }
+    res.json({
+      success: true,
+      userData: {
+        name: user.name,
+        isAccountVerified: user.isAccountVerified,
+      },
+    });
+  } catch (error) {
+    console.error("GetUserData error:", error.message);
+    return res.json({ success: false, message: error.message });
+  }
+};
